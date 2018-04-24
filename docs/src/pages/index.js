@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'gatsby-link'
 import { Button } from '../../../src'
-import TopBar from '../components/TopBar'
+import logoStandalone from '../images/evergreen-logo-wordmark-white.svg'
 
 const NativeLink = ({ ...props }) => {
   return <a target="_blank" rel="noopener noreferrer" {...props} />
@@ -10,30 +10,37 @@ const NativeLink = ({ ...props }) => {
 export default () => {
   return (
     <div className="MainLayout">
-      <TopBar />
       <main className="MainLayout-main">
         <div className="MainLayout-content">
-          <section className="Home">
-            <div className="Home-inner">
-              <h1>
-                Evergreen is a pragmatic UI kit<br /> for building
-                evolving&nbsp;products on&nbsp;the&nbsp;web.
-              </h1>
+          <section className="Hero">
+            <div className="Hero-inner">
+              <img src={logoStandalone} alt="Evergreen" className="Hero-logo" />
+              <h1>React UI Framework for the Web</h1>
               <p>
-                It is build and maintained open&#8209;source&nbsp;by&nbsp;
+                Build and Maintained Open‑Source by{' '}
                 <NativeLink className="Link" href="https://segment.com/">
                   Segment
-                </NativeLink>.
+                </NativeLink>
               </p>
-              <div>
+              <div className="Hero-buttons">
                 <Button
                   is={Link}
-                  to="/get-started/introduction"
+                  to="/components/"
                   appearance="green"
                   height={40}
+                  marginRight={16}
                 >
-                  Get Started
+                  Components
                 </Button>
+                <NativeLink
+                  href="https://github.com/segmentio/evergreen"
+                  className="OutlineButtonWhite"
+                  style={{
+                    width: 136
+                  }}
+                >
+                  GitHub
+                </NativeLink>
               </div>
             </div>
           </section>

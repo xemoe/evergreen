@@ -32,7 +32,7 @@ export default class TopBar extends PureComponent {
           <Link
             className="TopBar-link"
             activeClassName="is-active"
-            to="/components/buttons"
+            to="/components/"
           >
             Components
           </Link>
