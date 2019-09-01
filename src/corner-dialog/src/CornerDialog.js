@@ -105,6 +105,11 @@ export default class CornerDialog extends PureComponent {
     hasCancel: PropTypes.bool,
 
     /**
+     * When true, the close button is shown.
+     */
+    hasClose: PropTypes.bool,
+
+    /**
      * Function that will be called when the cancel button is clicked.
      * This closes the Dialog by default.
      *
@@ -134,9 +139,11 @@ export default class CornerDialog extends PureComponent {
     hasFooter: true,
     confirmLabel: 'Learn More',
     hasCancel: true,
+    hasClose: true,
     cancelLabel: 'Close',
     onCancel: close => close(),
-    onConfirm: close => close()
+    onConfirm: close => close(),
+    onCloseComplete: () => {}
   }
 
   constructor(props) {
@@ -148,8 +155,9 @@ export default class CornerDialog extends PureComponent {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.isShown && !this.props.isShown) {
+  componentDidUpdate(prevProps) {
+    if (!prevProps.isShown && this.props.isShown) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
         exited: false
       })
@@ -178,6 +186,7 @@ export default class CornerDialog extends PureComponent {
     if (typeof children === 'function') {
       return children({ close: this.handleClose })
     }
+
     if (typeof children === 'string') {
       return (
         <Paragraph size={400} color="muted">
@@ -185,6 +194,7 @@ export default class CornerDialog extends PureComponent {
         </Paragraph>
       )
     }
+
     return children
   }
 
@@ -196,6 +206,7 @@ export default class CornerDialog extends PureComponent {
       isShown,
       hasFooter,
       hasCancel,
+      hasClose,
       cancelLabel,
       confirmLabel,
       onOpenComplete,
@@ -234,12 +245,14 @@ export default class CornerDialog extends PureComponent {
                 <Heading is="h4" size={600} flex="1">
                   {title}
                 </Heading>
-                <IconButton
-                  height={32}
-                  icon="cross"
-                  appearance="minimal"
-                  onClick={this.handleClose}
-                />
+                {hasClose && (
+                  <IconButton
+                    height={32}
+                    icon="cross"
+                    appearance="minimal"
+                    onClick={this.handleClose}
+                  />
+                )}
               </Pane>
 
               <Pane overflowY="auto" data-state={state}>

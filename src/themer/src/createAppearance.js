@@ -16,7 +16,10 @@ const whitelist = [
 
   'outline',
   // Not sure if cursor should be configurable
-  'cursor'
+  'cursor',
+
+  // Added to prevent pointer events on disabled tab
+  'pointerEvents'
 ]
 
 /**
@@ -39,7 +42,7 @@ function createAppearance(obj = {}) {
       }
     } else if (isDev) {
       console.error(
-        `createAppearance() only accepts whitelisted properties, key '${key}' is not whitelisted in whitelist: `,
+        `createAppearance() only accepts whitelisted properties, key '${key}' is not whitelisted in whitelist:`,
         whitelist
       )
     }

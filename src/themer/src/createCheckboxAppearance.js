@@ -30,6 +30,7 @@ const baseStyle = {
   WebkitFontSmoothing: 'antialiased',
   textDecoration: 'none',
   WebkitAppearance: 'none',
+  MozAppearance: 'none',
   border: 'none',
   outline: 'none',
   cursor: 'pointer'
@@ -61,7 +62,7 @@ const createCheckboxAppearance = (items = {}) => {
     ],
     cb: prop => {
       console.error(
-        `Themer.createCheckboxAppearance() is missing a ${prop} state in items: `,
+        `Themer.createCheckboxAppearance() is missing a ${prop} state in items:`,
         items
       )
     }

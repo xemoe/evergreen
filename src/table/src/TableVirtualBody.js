@@ -46,7 +46,24 @@ export default class TableVirtualBody extends PureComponent {
      * When allowAutoHeight is true and this prop is true, the estimated height
      * will be computed based on the average height of auto height rows.
      */
-    useAverageAutoHeightEstimation: PropTypes.bool
+    useAverageAutoHeightEstimation: PropTypes.bool,
+
+    /**
+     * The scrollToIndex property passed to react-tiny-virtual-list
+     */
+    scrollToIndex: PropTypes.number,
+    /**
+     * The scrollOffset property passed to react-tiny-virtual-list
+     */
+    scrollOffset: PropTypes.number,
+    /**
+     * The scrollToAlignment property passed to react-tiny-virtual-list
+     */
+    scrollToAlignment: PropTypes.oneOf(['start', 'center', 'end', 'auto']),
+    /**
+     * The onScroll callback passed to react-tiny-virtual-list
+     */
+    onScroll: PropTypes.func
   }
 
   static defaultProps = {
@@ -246,6 +263,10 @@ export default class TableVirtualBody extends PureComponent {
       overscanCount,
       estimatedItemSize,
       useAverageAutoHeightEstimation,
+      scrollToIndex,
+      scrollOffset,
+      scrollToAlignment,
+      onScroll,
       ...props
     } = this.props
 
@@ -279,21 +300,33 @@ export default class TableVirtualBody extends PureComponent {
           itemSize={itemSize}
           overscanCount={overscanCount}
           itemCount={React.Children.count(children)}
+          scrollToIndex={scrollToIndex}
+          scrollOffset={scrollOffset}
+          scrollToAlignment={scrollToAlignment}
+          onScroll={onScroll}
           renderItem={({ index, style }) => {
+            const child = children[index]
+            const key = child.key || index
+            const props = {
+              key,
+              style
+            }
+
             // If some children are strings by accident, support this gracefully.
-            if (!React.isValidElement(children[index])) {
-              if (typeof children[index] === 'string') {
-                return <div style={style}>{children[index]}</div>
+            if (!React.isValidElement(child)) {
+              if (typeof child === 'string') {
+                return <div {...props}>{child}</div>
               }
-              return <div style={style}>&nbsp;</div>
+
+              return <div {...props}>&nbsp;</div>
             }
 
             // When allowing height="auto" for rows, and a auto height item is
             // rendered for the first time...
             if (
               allowAutoHeight &&
-              React.isValidElement(children[index]) &&
-              children[index].props.height === 'auto' &&
+              React.isValidElement(child) &&
+              child.props.height === 'auto' &&
               // ... and only when the height is not already been calculated.
               !this.autoHeights[index]
             ) {
@@ -303,21 +336,20 @@ export default class TableVirtualBody extends PureComponent {
                 <div
                   ref={ref => this.onVirtualHelperRef(index, ref)}
                   data-virtual-index={index}
+                  {...props}
                   style={{
                     opacity: 0,
-                    ...style
+                    ...props.style
                   }}
                 >
-                  {children[index]}
+                  {child}
                 </div>
               )
             }
 
             // When allowAutoHeight is false, or when the height is known.
             // Simply render the item.
-            return React.cloneElement(children[index], {
-              style
-            })
+            return React.cloneElement(child, props)
           }}
         />
       </Pane>

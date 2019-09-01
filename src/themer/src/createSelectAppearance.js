@@ -3,6 +3,7 @@ import missingStateWarning from './missingStateWarning'
 
 const baseStyle = {
   WebkitAppearance: 'none',
+  MozAppearance: 'none',
   border: 'none',
   flex: 1,
   background: 'none',
@@ -18,7 +19,7 @@ const baseStyle = {
 }
 
 const disabledState = '[disabled]'
-const invalidState = '&[aria-invalid]'
+const invalidState = '&[aria-invalid="true"]'
 const hoverState = '&:not([disabled]):hover'
 const focusState = '&:not([disabled]):focus'
 const activeState = '&:not([disabled]):active'
@@ -33,7 +34,7 @@ const createSelectAppearance = (items = {}) => {
     props: ['base', 'disabled', 'invalid', 'hover', 'active', 'focus'],
     cb: prop => {
       console.error(
-        `Themer.createSelectAppearance() is missing a ${prop} item `,
+        `Themer.createSelectAppearance() is missing a ${prop} item`,
         items
       )
     }

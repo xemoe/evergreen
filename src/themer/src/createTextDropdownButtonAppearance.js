@@ -5,6 +5,7 @@ import missingStateWarning from './missingStateWarning'
 const baseStyle = {
   WebkitFontSmoothing: 'antialiased',
   WebkitAppearance: 'none',
+  MozAppearance: 'none',
   verticalAlign: 'middle',
   textDecoration: 'none',
   border: 'none',
@@ -29,7 +30,7 @@ const createButtonAppearance = (items = {}) => {
     props: ['base', 'hover', 'focus', 'active', 'disabled'],
     cb: prop => {
       console.error(
-        `Themer.createTextDropdownButtonAppearance() is missing a ${prop} state in items: `,
+        `Themer.createTextDropdownButtonAppearance() is missing a ${prop} state in items:`,
         items
       )
     }
@@ -47,4 +48,5 @@ const createButtonAppearance = (items = {}) => {
     [activeState]: createAppearance(items.active)
   }
 }
+
 export default createButtonAppearance

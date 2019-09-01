@@ -21,7 +21,7 @@ It contains a label and optional icons before or after the label.
 
 ## All button variations
 
-```js
+```jsx collapse
 <Component
   initialState={{
     options: [
@@ -276,7 +276,7 @@ This is not a required property, the icon will automatically resize based on the
 
 ## Common icon buttons
 
-```js
+```jsx collapse
 <Pane clearfix>
   <Pane borderRight paddingRight={24} marginRight={24} float="left">
     <Heading marginBottom={16}>Height 32</Heading>
@@ -397,6 +397,14 @@ The `BackButton` component is a preset based on the `Button` component.
 ```
 
 <PropsTable of="BackButton" />
+
+# Buttons as links
+
+Buttons can be used as links by using the optional `is` property with a value such as `Link` from [react-router](https://github.com/ReactTraining/react-router), or an `a` tag.
+
+```jsx
+<Button is="a" href="#">Link</Button>
+```
 
 # TextDropdownButton component
 

@@ -136,6 +136,7 @@ class Avatar extends PureComponent {
     if (size <= sizeLimitOneCharacter) {
       initials = initials.substring(0, 1)
     }
+
     const colorProps = this.getColorProps()
 
     return (
@@ -146,6 +147,7 @@ class Avatar extends PureComponent {
         borderRadius={9999}
         position="relative"
         display="inline-flex"
+        flexShrink={0}
         justifyContent="center"
         backgroundColor={colorProps.backgroundColor}
         title={name}

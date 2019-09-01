@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-handler-names */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Pane } from '../../layers'
@@ -14,7 +13,7 @@ export default class TableHead extends PureComponent {
     /**
      * The height of the table head.
      */
-    height: PropTypes.number.isRequired,
+    height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
 
     /**
      * This should always be true if you are using TableHead together with a TableBody.

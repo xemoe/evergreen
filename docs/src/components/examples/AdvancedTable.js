@@ -1,6 +1,5 @@
 import React from 'react'
 import { filter } from 'fuzzaldrin-plus'
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   Table,
   Popover,
@@ -61,13 +60,16 @@ export default class AdvancedTable extends React.Component {
         bValue = Number(bValue.substr(1))
       }
 
+      // Support string comparison
+      const sortTable = { true: 1, false: -1 }
+
       // Order ascending (Order.ASC)
       if (this.state.ordering === Order.ASC) {
-        return aValue - bValue
+        return aValue === bValue ? 0 : sortTable[aValue > bValue]
       }
 
       // Order descending (Order.DESC)
-      return bValue - aValue
+      return bValue === aValue ? 0 : sortTable[bValue > aValue]
     })
   }
 
@@ -226,7 +228,7 @@ export default class AdvancedTable extends React.Component {
     return (
       <Table.Row key={profile.id}>
         <Table.Cell display="flex" alignItems="center">
-          <Avatar name={profile.name} flexShrink={0} />
+          <Avatar name={profile.name} />
           <Text marginLeft={8} size={300} fontWeight={500}>
             {profile.name}
           </Text>

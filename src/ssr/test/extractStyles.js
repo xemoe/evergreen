@@ -1,4 +1,3 @@
-/* eslint-disable import/first, import/order */
 import test from 'ava'
 import React from 'react'
 import Box from 'ui-box'
@@ -8,7 +7,7 @@ import extractStyles from '../src/extractStyles'
 
 test.serial('returns styles for a Box', t => {
   render(<Box height={11} />)
-  const result = extractStyles()
+  const result = extractStyles({ nonce: 'abcd1234' })
   t.snapshot(result)
   t.truthy(result.css)
   t.truthy(result.cache.uiBoxCache)

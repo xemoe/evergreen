@@ -57,8 +57,9 @@ export {
   TextTableCell
 } from './table'
 export { SidebarTab, Tab, Tablist, TabNavigation } from './tabs'
+export { TagInput } from './tag-input'
 export { TextInput, TextInputField } from './text-input'
-export { ThemeProvider, ThemeConsumer, withTheme, defaultTheme } from './theme'
+export { ThemeContext, ThemeProvider, ThemeConsumer, withTheme, defaultTheme } from './theme'
 export { Textarea } from './textarea'
 export { toaster } from './toaster'
 export { Tooltip } from './tooltip'

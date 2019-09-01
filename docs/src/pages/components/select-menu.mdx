@@ -18,17 +18,22 @@ and uses `react-tiny-virtual-list` for the rendering of the virtualized list of 
 The `SelectMenu` is unopinionated in how many items are selected in the list.
 Pass an array to the `selected` prop to select more items.
 
+## Close on select
+
+The `SelectMenu` by default will stay open when an option is selected.
+This can be configured so that the menu closes on selection.
+This will not apply for Multiselect menus.
+
 ## Options prop structure
 
-<SyntaxHighlighter>{`
+```js static
 const options = [
   {
     label: 'String',
-    labelInList: 'Optional label to appear in list',
     value: 'String or Number'
   }
 ]
-`}</SyntaxHighlighter>
+```
 
 ## Single selected item
 
@@ -131,6 +136,57 @@ Available positions:
 </Component>
 ```
 
+## Empty view
+
+It's possible to display a custom empty view instead of options list via `emptyView`, when there are no properties supplied.
+Note that empty view won't be shown when options are being filtered and there are no search results.
+
+```jsx
+<SelectMenu
+  title="Empty view"
+  options={[]}
+  emptyView={(
+    <Pane height="100%" display="flex" alignItems="center" justifyContent="center">
+      <Text size={300}>No options found</Text>
+    </Pane>
+  )}
+>
+  <Button>Select option...</Button>
+</SelectMenu>
+```
+
+It's also possible to close `<SelectMenu>` from within empty view:
+
+```jsx
+<SelectMenu
+  title="Empty view"
+  options={[]}
+  emptyView={({ close }) => (
+    <Pane height="100%" display="flex" alignItems="center" justifyContent="center">
+      <Button onClick={close}>Close</Button>
+    </Pane>
+  )}
+>
+  <Button>Select option...</Button>
+</SelectMenu>
+```
+
+## Menu with icons
+
+It's possible to include icons in the menu list.
+
+```jsx
+<SelectMenu
+  title="Options with icons"
+  options={[
+    { label: 'Apple', value: 'Apple', icon: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Malus-Boskoop_organic.jpg' },
+    { label: 'Banana', value: 'Banana', icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Bananas_white_background_DS.jpg/2560px-Bananas_white_background_DS.jpg' },
+  ]}
+>
+  <Button>Select option...</Button>
+</SelectMenu>
+```
+
 
 ## Multiselect with deselect example
 
@@ -192,6 +248,135 @@ As users click on selected values to remove them, you can update state.
       }}
     >
       <Button>{state.selectedNames || 'Select multiple...'}</Button>
+    </SelectMenu>
+  )}
+</Component>
+```
+
+## onFilterChange example
+
+This example shows basic usage with onFocusChange.
+
+```jsx
+<Component initialState={{ selected: null }}>
+  {({ setState, state }) => (
+    <Pane>
+    <Pane marginBottom={8}>
+      <Text>Filter value: {state.filter}</Text>
+    </Pane>
+    <SelectMenu
+      title="Select name"
+      onFilterChange={filter => setState({filter})}
+      options={
+        ['Apple', 'Apricot', 'Banana', 'Cherry', 'Cucumber']
+          .map(label => ({ label, value: label }))
+      }
+      selected={state.selected}
+      onSelect={item => setState({ selected: item.value })}
+    >
+      <Button>{state.selected || 'Select name...'}</Button>
+    </SelectMenu>
+    </Pane>
+  )}
+
+</Component>
+```
+
+## Disabled option example
+
+This example shows basic usage for disabling some options. Options that are disabled cannot be clicked and their labels are muted.
+
+```jsx
+<Component initialState={{ selected: null }}>
+  {({ setState, state }) => (
+    <Pane>
+    <SelectMenu
+      title="Select Option"
+      options={
+        [{ label: "Disabled", value: "disabled", disabled: true }, { label: "Not Disabled", value: "not-disabled" }]
+      }
+      selected={state.selected}
+      onSelect={item => setState({ selected: item.value })}
+    >
+      <Button>{state.selected || 'Select name...'}</Button>
+    </SelectMenu>
+    </Pane>
+  )}
+
+</Component>
+```
+## Custom Title Example
+
+This example shows how one should use titleView to pass in a custom title.
+
+```jsx
+<Component initialState={{ selected: null }}>
+  {({ setState, state }) => (
+    <Pane>
+    <SelectMenu
+      title="Select Option"
+      tooltipContent="Choose one of the options below."
+      titleView={({ close, title, headerHeight }) => {
+        return (
+          <Pane
+            display="flex"
+            alignItems="center"
+            borderBottom="default"
+            padding={8}
+            height={headerHeight}
+            boxSizing="border-box"
+          >
+            <Pane flex="1" display="flex" alignItems="center">
+              <Heading size={400}>{title}</Heading>
+                <Tooltip content="Pick one of the options below">
+                  <Icon size={12} marginLeft={4} icon="help" />
+                </Tooltip>
+            </Pane>
+            <IconButton
+              icon="cross"
+              appearance="minimal"
+              height={24}
+              onClick={close}
+            />
+          </Pane>
+        )
+      }}
+      options={
+        [{ label: "Option 1", value: "option-1"}, { label: "Option 2", value: "option-2" }]
+      }
+      selected={state.selected}
+      onSelect={item => setState({ selected: item.value })}
+    >
+      <Button>{state.selected || 'Select name...'}</Button>
+    </SelectMenu>
+    </Pane>
+  )}
+
+</Component>
+```
+
+## Custom Filter PlaceHolder and Icon Example
+
+It's possible to change the filter placeholder and filter icon through the `filterPlaceholder` and `filterIcon` props.
+
+Note that the icon can be one found in Segment's various [icons](https://evergreen.segment.com/components/icons), or `none`.
+
+
+```jsx
+<Component initialState={{ selected: null }}>
+  {({ setState, state }) => (
+    <SelectMenu
+      title="Select name"
+      options={
+        ['Comedy', 'Drama', 'Fantasy', 'Family', 'Action']
+          .map(label => ({ label, value: label }))
+      }
+      selected={state.selected}
+      onSelect={item => setState({ selected: item.value })}
+      filterPlaceholder={"Choose a genre"}
+      filterIcon={"film"}
+    >
+      <Button>{state.selected || 'Select name...'}</Button>
     </SelectMenu>
   )}
 </Component>

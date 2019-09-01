@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-curly-brace-presence */
 import React from 'react'
 import Helmet from 'react-helmet'
 import TopBar from '../../components/TopBar'
@@ -31,14 +30,14 @@ export default () => {
                   <p className="p">
                     Evergreen is a pragmatic UI kit for building evolving
                     products on the web.
-                    <br /> It is build and maintained open-source by{' '}
+                    <br /> It is built and maintained open-source by{' '}
                     <NativeLink href="https://segment.com/">Segment</NativeLink>
                     .
                   </p>
                   <h2>Core beliefs of Evergreen</h2>
                   <p>
                     <strong>
-                      Evergreen is build on the belief that you can never
+                      Evergreen is built on the belief that you can never
                       predict all future requirements, only prepare for it.
                     </strong>
                     {` `}
@@ -48,7 +47,7 @@ export default () => {
                   </p>
                   <p>
                     <strong>
-                      Evergreen is build on the belief that things should work
+                      Evergreen is built on the belief that things should work
                       out of the box with smart defaults and offer full control
                       when needed.
                     </strong>

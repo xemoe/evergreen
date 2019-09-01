@@ -13,7 +13,9 @@ import Option from './Option'
  * @param options <Array[String]> - ['label', 'label2', ...]
  * @param input <String>
  */
-const fuzzyFilter = (options, input) => fuzzaldrin.filter(options, input)
+const fuzzyFilter = (options, input, { key }) => {
+  return fuzzaldrin.filter(options, input, { key })
+}
 
 /**
  * This is the default item renderer of options
@@ -34,15 +36,24 @@ export default class OptionsList extends PureComponent {
     isMultiSelect: PropTypes.bool,
 
     /**
+     * When true, menu closes on option selection.
+     */
+    closeOnSelect: PropTypes.bool,
+
+    /**
      * This holds the values of the options
      */
-    selected: PropTypes.arrayOf(PropTypes.string),
+    selected: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    ),
     onSelect: PropTypes.func,
     onDeselect: PropTypes.func,
+    onFilterChange: PropTypes.func,
     hasFilter: PropTypes.bool,
     optionSize: PropTypes.number,
     renderItem: PropTypes.func,
-    placeholder: PropTypes.string,
+    filterPlaceholder: PropTypes.string,
+    filterIcon: PropTypes.string,
     optionsFilter: PropTypes.func,
     defaultSearchValue: PropTypes.string
   }
@@ -57,10 +68,11 @@ export default class OptionsList extends PureComponent {
     optionSize: 33,
     onSelect: () => {},
     onDeselect: () => {},
+    onFilterChange: () => {},
     selected: [],
     renderItem: itemRenderer,
-    optionsFilter: fuzzyFilter,
-    placeholder: 'Filter...',
+    filterPlaceholder: 'Filter...',
+    filterIcon: 'search',
     defaultSearchValue: ''
   }
 
@@ -91,10 +103,11 @@ export default class OptionsList extends PureComponent {
     window.removeEventListener('keydown', this.handleKeyDown)
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.selected !== this.state.selected) {
+  componentDidUpdate(prevProps) {
+    if (prevProps.selected !== this.props.selected) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
-        selected: nextProps.selected
+        selected: this.props.selected
       })
     }
   }
@@ -109,14 +122,18 @@ export default class OptionsList extends PureComponent {
     const { optionsFilter } = this.props
     const { searchValue } = this.state
 
-    return searchValue.trim() === ''
-      ? options // Return if no search query
-      : optionsFilter(
-          options.map(item => item.labelInList || item.label),
-          searchValue
-        ).map(name =>
-          options.find(item => item.labelInList === name || item.label === name)
-        )
+    if (searchValue.trim() === '') {
+      return options
+    }
+
+    // Preserve backwards compatibility with allowing custom filters, which accept array of strings
+    if (typeof optionsFilter === 'function') {
+      return optionsFilter(options.map(item => item.label), searchValue).map(
+        name => options.find(item => item.label === name)
+      )
+    }
+
+    return fuzzyFilter(options, searchValue, { key: 'label' })
   }
 
   getCurrentIndex = () => {
@@ -186,10 +203,14 @@ export default class OptionsList extends PureComponent {
     this.setState({
       searchValue
     })
+    this.props.onFilterChange(searchValue)
   }
 
   handleSelect = item => {
     this.props.onSelect(item)
+    if (!this.props.isMultiSelect && this.props.closeOnSelect) {
+      this.props.close()
+    }
   }
 
   handleDeselect = item => {
@@ -208,11 +229,13 @@ export default class OptionsList extends PureComponent {
       height,
       onSelect,
       onDeselect,
+      onFilterChange,
       selected,
       hasFilter,
+      filterPlaceholder,
+      filterIcon,
       optionSize,
       renderItem,
-      placeholder,
       optionsFilter,
       isMultiSelect,
       defaultSearchValue,
@@ -238,6 +261,8 @@ export default class OptionsList extends PureComponent {
               innerRef={this.assignSearchRef}
               borderRight={null}
               height={32}
+              placeholder={filterPlaceholder}
+              icon={filterIcon}
             />
           </TableHead>
         )}
@@ -260,12 +285,14 @@ export default class OptionsList extends PureComponent {
               return renderItem({
                 key: item.value,
                 label: item.label,
+                icon: item.icon,
                 style,
                 height: optionSize,
                 onSelect: () => this.handleSelect(item),
                 onDeselect: () => this.handleDeselect(item),
                 isSelectable: !isSelected || isMultiSelect,
-                isSelected
+                isSelected,
+                disabled: item.disabled
               })
             }}
           />

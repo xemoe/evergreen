@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { withTheme } from '../../theme'
 import { Portal } from '../../portal'
 import { Stack } from '../../stack'
+import safeInvoke from '../../lib/safe-invoke'
 import TextTableCell from './TextTableCell'
 import TableCell from './TableCell'
 import EditableCellField from './EditableCellField'
@@ -43,25 +44,23 @@ class EditableCell extends React.PureComponent {
     /**
      * Function called when value changes. (value: string) => void.
      */
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+
+    /**
+     * When true, the cell will initialize in the editing state.
+     */
+    autoFocus: PropTypes.bool
   }
 
   static defaultProps = {
     size: 300,
-    isSelectable: true
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.children !== state.value) {
-      return {
-        value: props.children
-      }
-    }
-    return null
+    isSelectable: true,
+    autoFocus: false
   }
 
   state = {
-    value: this.props.children
+    value: this.props.children,
+    isEditing: this.props.autoFocus
   }
 
   onMainRef = ref => {
@@ -88,30 +87,32 @@ class EditableCell extends React.PureComponent {
      * When the user presses a character on the keyboard, use that character
      * as the value in the text field.
      */
-    if (key.match(/^[a-z]{0,10}$/) && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      this.setState({
-        isEditing: true,
-        value: key
-      })
-    } else if (key === 'Enter') {
+    if (key === 'Enter' || key === 'Shift') {
       this.setState({
         isEditing: true
       })
+    } else if (
+      key.match(/^[a-z]{0,10}$/) &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      this.setState(prevState => ({
+        isEditing: true,
+        value: prevState.value + key
+      }))
     }
   }
 
   handleFieldChangeComplete = value => {
     const { onChange, isSelectable } = this.props
-    const currentValue = this.state.value
 
     this.setState({
       isEditing: false,
       value
     })
 
-    if (currentValue !== value && typeof onChange === 'function') {
-      onChange(value)
-    }
+    safeInvoke(onChange, value)
 
     if (this.mainRef && isSelectable) {
       this.mainRef.focus()
@@ -143,7 +144,7 @@ class EditableCell extends React.PureComponent {
       <React.Fragment>
         <TextTableCell
           innerRef={this.onMainRef}
-          isSelectable={isSelectable && !disabled}
+          isSelectable={isSelectable}
           onClick={this.handleClick}
           onDoubleClick={this.handleDoubleClick}
           onKeyDown={this.handleKeyDown}

@@ -25,6 +25,10 @@ export default class Popover extends Component {
      * When true, the Popover is manually shown.
      */
     isShown: PropTypes.bool,
+    /**
+     * Open the Popover based on click or hover. Default is click.
+     */
+    trigger: PropTypes.oneOf(['click', 'hover']),
 
     /**
      * The content of the Popover.
@@ -57,7 +61,7 @@ export default class Popover extends Component {
     /**
      * Properties passed through to the Popover card.
      */
-    statelessProps: PropTypes.objectOf(PopoverStateless.propTypes),
+    statelessProps: PropTypes.shape(PopoverStateless.propTypes),
 
     /**
      * Duration of the animation.
@@ -83,24 +87,36 @@ export default class Popover extends Component {
      * Function that will be called when the exit transition is complete.
      */
     onCloseComplete: PropTypes.func.isRequired,
+    
+    /**
+     * Function that will be called when the body is clicked.
+     */
+    onBodyClick: PropTypes.func.isRequired,
 
     /**
      * When true, bring focus inside of the Popover on open.
      */
-    bringFocusInside: PropTypes.bool
+    bringFocusInside: PropTypes.bool,
+
+    /**
+     * Boolean indicating if clicking outside the dialog should close the dialog.
+     */
+    shouldCloseOnExternalClick: PropTypes.bool
   }
 
   static defaultProps = {
     position: Position.BOTTOM,
-    isShown: false,
     minWidth: 200,
     minHeight: 40,
     animationDuration: 300,
     onOpen: () => {},
     onClose: () => {},
     onOpenComplete: () => {},
-    onCloseComplete: () => {},
-    bringFocusInside: false
+    onCloseComplete: () => {},    
+    onBodyClick: () => {},
+    bringFocusInside: false,
+    shouldCloseOnExternalClick: true,
+    trigger: 'click'
   }
 
   constructor(props) {
@@ -186,6 +202,13 @@ export default class Popover extends Component {
     if (this.popoverNode && this.popoverNode.contains(e.target)) {
       return
     }
+    
+    // Notify body click
+    this.props.onBodyClick(e)
+
+    if (this.props.shouldCloseOnExternalClick === false) {
+      return
+    }
 
     this.close()
   }
@@ -227,7 +250,6 @@ export default class Popover extends Component {
     document.body.removeEventListener('keydown', this.onEsc, false)
 
     this.bringFocusBackToTarget()
-
     this.props.onClose()
   }
 
@@ -243,6 +265,18 @@ export default class Popover extends Component {
   handleKeyDown = e => {
     if (e.key === 'ArrowDown') {
       this.bringFocusInside()
+    }
+  }
+
+  handleOpenHover = () => {
+    if (this.props.trigger === 'hover') {
+      this.open()
+    }
+  }
+
+  handleCloseHover = () => {
+    if (this.props.trigger === 'hover') {
+      this.close()
     }
   }
 
@@ -268,6 +302,7 @@ export default class Popover extends Component {
 
     const popoverTargetProps = {
       onClick: this.toggle,
+      onMouseEnter: this.handleOpenHover,
       onKeyDown: this.handleKeyDown,
       role: 'button',
       'aria-expanded': isShown,
@@ -316,7 +351,8 @@ export default class Popover extends Component {
     } = this.props
     const { isShown: stateIsShown } = this.state
 
-    const shown = isShown || stateIsShown
+    // If `isShown` is a boolean, popover is controlled manually, not via mouse events
+    const shown = typeof isShown === 'boolean' ? isShown : stateIsShown
 
     return (
       <Positioner
@@ -342,6 +378,7 @@ export default class Popover extends Component {
             minWidth={minWidth}
             minHeight={minHeight}
             {...statelessProps}
+            onMouseLeave={this.handleCloseHover}
           >
             {typeof content === 'function'
               ? content({ close: this.close })

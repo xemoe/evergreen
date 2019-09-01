@@ -4,7 +4,10 @@ import React from 'react'
 import Box from 'ui-box'
 import { SelectMenu } from '..'
 import { Button } from '../../buttons'
-import options from './starwars-options'
+import { Text } from '../../typography'
+import { Pane } from '../../layers'
+import { TextInput } from '../../text-input'
+import options, { optionsWithIcons } from './starwars-options'
 import Manager from './Manager'
 
 storiesOf('select-menu', module).add('SelectMenu', () => (
@@ -23,6 +26,80 @@ storiesOf('select-menu', module).add('SelectMenu', () => (
         >
           <Button>{state.selected || 'Select name...'}</Button>
         </SelectMenu>
+      )}
+    </Manager>
+    <Manager>
+      {({ setState, state }) => (
+        <SelectMenu
+          title="Select name"
+          options={options}
+          selected={state.selected}
+          onSelect={item => setState({ selected: item.value })}
+          closeOnSelect
+        >
+          <Button>Menu will close on select</Button>
+        </SelectMenu>
+      )}
+    </Manager>
+    <Manager>
+      {({ setState, state }) => (
+        <SelectMenu
+          title="Select name"
+          options={optionsWithIcons}
+          selected={state.selected}
+          onSelect={item => setState({ selected: item.value })}
+        >
+          <Button>Options with icons</Button>
+        </SelectMenu>
+      )}
+    </Manager>
+    <Manager>
+      {({ setState, state }) => (
+        <Pane display="inline-block">
+          <Text display="block">Filter Text: {state.filterText}</Text>
+          <SelectMenu
+            title="Select name"
+            options={options}
+            selected={state.selected}
+            onFilterChange={filterText => setState({ filterText })}
+            onSelect={item => setState({ selected: item.value })}
+          >
+            <Button>Select w/ onFilterChange</Button>
+          </SelectMenu>
+        </Pane>
+      )}
+    </Manager>
+    <Manager>
+      {({ setState, state }) => (
+        <Pane display="block">
+          Filter Placeholder:{' '}
+          <TextInput
+            onChange={event =>
+              setState({ placeholderText: event.target.value })
+            }
+            width={100}
+            display="inline-block"
+          />
+          Icon:{' '}
+          <TextInput
+            onChange={event =>
+              setState({ placeholderIcon: event.target.value })
+            }
+            width={100}
+            display="inline-block"
+          />
+          <SelectMenu
+            title="Select w/ changeable filter placeholder and icon"
+            options={options}
+            selected={state.selected}
+            filterPlaceholder={state.placeholderText}
+            filterIcon={state.placeholderIcon}
+            onFilterChange={filterText => setState({ filterText })}
+            onSelect={item => setState({ selected: item.value })}
+          >
+            <Button>Select w/ changeable filter placeholder and icon</Button>
+          </SelectMenu>
+        </Pane>
       )}
     </Manager>
     <Component
@@ -49,6 +126,7 @@ storiesOf('select-menu', module).add('SelectMenu', () => (
             } else if (selectedItemsLength > 1) {
               selectedNames = selectedItemsLength.toString() + ' selected...'
             }
+
             setState({
               selected,
               selectedNames
@@ -68,6 +146,7 @@ storiesOf('select-menu', module).add('SelectMenu', () => (
             } else if (selectedItemsLength > 1) {
               selectedNames = selectedItemsLength.toString() + ' selected...'
             }
+
             setState({ selected: selectedItems, selectedNames })
           }}
         >
@@ -75,5 +154,20 @@ storiesOf('select-menu', module).add('SelectMenu', () => (
         </SelectMenu>
       )}
     </Component>
+    <SelectMenu
+      title="Empty state"
+      emptyView={
+        <Box
+          height="100%"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Text size={300}>No options found</Text>
+        </Box>
+      }
+    >
+      <Button>Empty state</Button>
+    </SelectMenu>
   </Box>
 ))
